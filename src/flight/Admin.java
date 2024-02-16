@@ -1,20 +1,11 @@
 package flight;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
@@ -25,42 +16,27 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import inheritance.Flight;
+import inheritance.Passenger;
+
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+import static flight.NewReservation.tempFlight;
+
 /**
  * Class Admin is the database where administrators can see and make actions on the bookings
  * @author user
  */
 public class Admin extends JFrame {
 
-	private JPanel contentPane;
-	private JTable table;
+    private final JTable table;
 	private ArrayList<Flight> data;
-	AdminLog adminLog = new AdminLog();
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Admin frame = new Admin();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -73,57 +49,23 @@ public class Admin extends JFrame {
 		try {
 			FileWriter fileWriter;
 			if (!exists) {
-				fileWriter = new FileWriter("flights.json");
-			}
-
-			Reader reader = new FileReader("flights.json");
-			Gson gson = new Gson();
-
-			java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {
-			}.getType();
-
-			BufferedReader br = new BufferedReader(reader);
-
-			fileWriter = new FileWriter("flights.json");
-
+                new FileWriter("flights.json");
+            }
+            new FileReader("flights.json");
+            Gson gson = new Gson();
+            new TypeToken<ArrayList<Flight>>() {};
+            fileWriter = new FileWriter("flights.json");
 			gson.toJson(flights, fileWriter);
 			fileWriter.close();
 			return true;
 		} catch (Exception e) {
-
 			System.out.println(e);
 			return false;
 		}
 	}
 
-	protected boolean write_to_temp_file(Flight flight) {
-
-		String yourFile = "temp_flight.json";
-		File tmpDir = new File(yourFile);
-		boolean exists = tmpDir.exists();
-
-		try {
-			FileWriter fileWriter;
-			if (!exists) {
-				fileWriter = new FileWriter("temp_flight.json");
-				fileWriter.close();
-			}
-
-			Reader reader = new FileReader("temp_flight.json");
-			Gson gson = new Gson();
-
-			BufferedReader br = new BufferedReader(reader);
-
-			fileWriter = new FileWriter("temp_flight.json");
-
-			gson.toJson(flight, fileWriter);
-			fileWriter.close();
-			return true;
-		} catch (Exception e) {
-
-			System.out.println(e);
-			return false;
-		}
+	protected void write_to_temp_file(Flight flight) {
+		tempFlight(flight);
 	}
 
 	public void getData() {
@@ -132,27 +74,28 @@ public class Admin extends JFrame {
 		boolean exists = tmpDir.exists();
 
 		try {
-			java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {
-			}.getType();
-
-			ArrayList<Flight> p = new ArrayList<Flight>();
-
-			FileWriter fileWriter;
-			if (!exists) {
-				fileWriter = new FileWriter("flights.json");
-				fileWriter.close();
-			}
-
-			Reader reader = new FileReader("flights.json");
-			Gson gson = new Gson();
-
-			BufferedReader br = new BufferedReader(reader);
-			p = gson.fromJson(reader, listType);
-
+			java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {}.getType();
+			ArrayList<Flight> p;
+			p = getFlights(exists, listType);
 			data = p;
 		} catch (Exception ex) {
 			System.out.println(ex);
 		}
+	}
+
+	static ArrayList<Flight> getFlights(boolean exists, java.lang.reflect.Type listType) throws IOException {
+		ArrayList<Flight> p;
+		FileWriter fileWriter;
+		if (!exists) {
+			fileWriter = new FileWriter("flights.json");
+			fileWriter.close();
+		}
+
+		Reader reader = new FileReader("flights.json");
+		Gson gson = new Gson();
+
+        p = gson.fromJson(reader, listType);
+		return p;
 	}
 
 	public Admin() {
@@ -160,7 +103,7 @@ public class Admin extends JFrame {
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1280, 760);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBackground(new Color(102, 153, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -172,12 +115,10 @@ public class Admin extends JFrame {
 			public void mouseEntered(MouseEvent arg0) {
 				lblX.setBackground(Color.RED);
 			}
-
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				lblX.setBackground(new Color(204, 0, 0));
 			}
-
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				System.exit(0);
@@ -249,7 +190,7 @@ public class Admin extends JFrame {
 		JButton btnNewButton = new JButton("DISPLAY TICKETS");
 		btnNewButton.addActionListener(new ActionListener() {
 			/**
-			 * From the file read the informations and display it in the table
+			 * From the file read the information and display it in the table
 			 */
 			public void actionPerformed(ActionEvent e) {
 				DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -285,21 +226,19 @@ public class Admin extends JFrame {
 			}
 		});
 		btnNewButton.setFont(new Font("Century Gothic", Font.BOLD, 13));
-		btnNewButton.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(255, 255, 0)));
+		btnNewButton.setBorder(new MatteBorder(1, 1, 1, 1, new Color(255, 255, 0)));
 		btnNewButton.setBackground(new Color(255, 204, 51));
 		btnNewButton.setBounds(1041, 100, 120, 30);
 		panel.add(btnNewButton);
 
 		JButton btnNewButton_1 = new JButton("BACK");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-				Display ds = new Display();
-				ds.setVisible(true);
-			}
-		});
+		btnNewButton_1.addActionListener(e -> {
+            dispose();
+            Display ds = new Display();
+            ds.setVisible(true);
+        });
 		btnNewButton_1.setFont(new Font("Century Gothic", Font.BOLD, 13));
-		btnNewButton_1.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(255, 255, 0)));
+		btnNewButton_1.setBorder(new MatteBorder(1, 1, 1, 1, new Color(255, 255, 0)));
 		btnNewButton_1.setBackground(new Color(255, 204, 51));
 		btnNewButton_1.setBounds(1041, 470, 120, 30);
 		panel.add(btnNewButton_1);
@@ -311,17 +250,16 @@ public class Admin extends JFrame {
 			 */
 			public void actionPerformed(ActionEvent e) {
 				int row = table.getSelectedRow();
-				String b_nr = table.getValueAt(row, 0).toString();
-				data = (ArrayList) data.stream().map(x -> {
+                table.getValueAt(row, 0).toString();
+                data = (ArrayList) data.stream().map(x -> {
 					x.setStatus("canceled");
 					return x;
 				}).collect(Collectors.toList());
 				write_to_file(data);
-
 			}
 		});
 		btnNewButton_2.setFont(new Font("Century Gothic", Font.BOLD, 13));
-		btnNewButton_2.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(255, 255, 0)));
+		btnNewButton_2.setBorder(new MatteBorder(1, 1, 1, 1, new Color(255, 255, 0)));
 		btnNewButton_2.setBackground(new Color(255, 204, 51));
 		btnNewButton_2.setBounds(1041, 224, 120, 30);
 		panel.add(btnNewButton_2);
@@ -345,7 +283,7 @@ public class Admin extends JFrame {
 			}
 		});
 		btnNewButton_3.setFont(new Font("Century Gothic", Font.BOLD, 13));
-		btnNewButton_3.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(255, 255, 0)));
+		btnNewButton_3.setBorder(new MatteBorder(1, 1, 1, 1, new Color(255, 255, 0)));
 		btnNewButton_3.setBackground(new Color(255, 204, 51));
 		btnNewButton_3.setBounds(1041, 340, 120, 30);
 		panel.add(btnNewButton_3);

@@ -1,18 +1,13 @@
 package flight;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.Panel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -22,7 +17,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import inheritance.Flight;
+import inheritance.Passenger;
 
 import javax.swing.JSeparator;
 /**
@@ -32,60 +28,33 @@ import javax.swing.JSeparator;
  */
 public class MyBooking extends JFrame {
 	private Flight flight;
-	private JPanel contentPane;
-	Display menu = new Display();
-	private JLabel label_2;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					MyBooking frame = new MyBooking();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
-
+    Display menu = new Display();
 	/**
 	 * Create the frame.
 	 */
 	public void getData() {
-
 		String yourFile = "temp_flight.json";
 		File tmpDir = new File(yourFile);
 		boolean exists = tmpDir.exists();
-
 		try {
 			FileWriter fileWriter;
 			if (!exists) {
 				fileWriter = new FileWriter("temp_flight.json");
 				fileWriter.close();
 			}
-
 			Reader reader = new FileReader("temp_flight.json");
 			Gson gson = new Gson();
 			flight = gson.fromJson(reader, Flight.class);
-
-			
-	
 		} catch (Exception e) {
-
 			System.out.println(e);
 		}
-			
 	}
 	public MyBooking() {
 		getData();
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1280, 760);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBackground(new Color(102, 153, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -320,8 +289,8 @@ public class MyBooking extends JFrame {
 		label_1.setFont(new Font("Century Gothic", Font.PLAIN, 15));
 		label_1.setBounds(215, 80, 170, 25);
 		panel_3.add(label_1);
-		
-		label_2 = new JLabel(flight.getTotal()+"$");
+
+        JLabel label_2 = new JLabel(flight.getTotal() + "$");
 		label_2.setFont(new Font("Century Gothic", Font.PLAIN, 15));
 		label_2.setBounds(400, 80, 170, 25);
 		panel_3.add(label_2);

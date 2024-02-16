@@ -2,7 +2,6 @@ package flight;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -13,12 +12,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,8 +38,10 @@ import javax.swing.border.LineBorder;
 
 import com.google.gson.Gson;
 import com.toedter.calendar.JDateChooser;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import inheritance.Flight;
+import inheritance.Passenger;
+
 /**
  * Class NewReservation allows the user to choose the flight,price and enter all personal and contact details
  * @author user
@@ -51,54 +49,22 @@ import com.google.gson.reflect.TypeToken;
  */
 public class NewReservation extends JFrame {
 	Display main = new Display();
-	private JPanel contentPane;
-	private JTextField textFieldFName;
-	private JTextField textFieldLName;
-	private JTextField textFieldResidence;
-	private JTextField textFieldPhone;
-	private JTextField textFieldCountry;
-	private JTextField textFieldEmail;
-	private JTextField textFieldCity;
-	private JTextField textFieldStreet;
-	private JLabel message;
-	private JLabel message1;
-	private JRadioButton radioButton;
-	private JRadioButton radioButton_1;
-	private JRadioButton radioButton_2;
-	private JRadioButton radioButton_3;
-	private JRadioButton radioButton_4;
-	private JRadioButton radioButton_5;
-	private JRadioButton radioButton_6;
-	private JRadioButton radioButton_7;
-	
-	private Random random = new Random();
-	Flight flight;
+	private JTextField txtCvv = null;
+    private final JTextField textFieldFName, textFieldLName, textFieldResidence, textFieldPhone,
+			textFieldCountry,textFieldEmail, textFieldCity, textFieldStreet, textFieldCard, textField;
+	private final JLabel message, message1, label_2, labelPricePromo, labelPriceEco, labelBusiness,
+			label_3, label_5, label_7, label_12, label_14, label_16, labeLTotal,label_23,label_25;
+	private final JRadioButton radioButton, radioButton_2, radioButton_5, rdbtnSelectFlight;
+	private JRadioButton radioButton_1 = null;
+	private JRadioButton radioButton_3,radioButton_4, radioButton_6, radioButton_7;
+	private final JComboBox comboBox, comboBox_1;
+	private JCheckBox chckbxIHaveRead;
+	private JLabel Message;
+    Flight flight;
 	double flight_price = 0;
 	Passenger passenger;
-	ArrayList<Passenger> passengers = new ArrayList<Passenger>();
-	private JLabel label_2;
-	private JRadioButton rdbtnSelectFlight;
-	private JLabel labelPricePromo;
-	private JLabel labelPriceEco;
-	private JLabel labelBusiness;
-	private JLabel label_3;
-	private JLabel label_5;
-	private JLabel label_7;
-	private JLabel label_12;
-	private JLabel label_14;
-	private JLabel label_16;
-	private JLabel labeLTotal;
-	private JComboBox comboBox;
-	private JComboBox comboBox_1;
-	private JCheckBox chckbxIHaveRead;
-	private JTextField textFieldCard;
-	private JTextField textField;
-	private JTextField txtCvv;
-	private JLabel Message;
-	private JLabel label_18;
-	private JLabel label_4;
-	private JLabel label_23;
-	private JLabel label_25;
+	ArrayList<Passenger> passengers = new ArrayList<>();
+
 
 	/**
 	 * Launch the application.
@@ -108,37 +74,28 @@ public class NewReservation extends JFrame {
 		String yourFile = "flights.json";
 		File tmpDir = new File(yourFile);
 		boolean exists = tmpDir.exists();
-
 		try {
-			  java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {
-	            }.getType();
-
-	            ArrayList<Flight> p = new ArrayList<Flight>();
-
-			FileWriter fileWriter;
-			if (!exists) {
-				fileWriter = new FileWriter("flights.json");
-				fileWriter.close();
-			}
-
-			Reader reader = new FileReader("flights.json");
-			Gson gson = new Gson();
-
-			BufferedReader br = new BufferedReader(reader);
-			p = gson.fromJson(reader, listType);
-			return p;			
+			java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {}.getType();
+			return getFlights(exists, listType);
 		} catch (Exception ex) {
-			System.out.println(ex);
-			return new ArrayList<Flight>();		
+			ex.printStackTrace();
+			return new ArrayList<>();
 		}
 	}
+
+	static ArrayList<Flight> getFlights(boolean exists, java.lang.reflect.Type listType) throws IOException {
+		return Admin.getFlights(exists, listType);
+	}
+
 	/**
 	 * Function to write to the temporary file
+	 *
 	 * @param flight
-	 * @return
 	 */
 	protected boolean write_to_temp_file(Flight flight) {
-
+		return tempFlight(flight);
+	}
+	static boolean tempFlight(Flight flight){
 		String yourFile = "temp_flight.json";
 		File tmpDir = new File(yourFile);
 		boolean exists = tmpDir.exists();
@@ -149,81 +106,52 @@ public class NewReservation extends JFrame {
 				fileWriter = new FileWriter("temp_flight.json");
 				fileWriter.close();
 			}
-
-			Reader reader = new FileReader("temp_flight.json");
+			new FileReader("temp_flight.json");
 			Gson gson = new Gson();
-
-			BufferedReader br = new BufferedReader(reader);
 
 			fileWriter = new FileWriter("temp_flight.json");
 
 			gson.toJson(flight, fileWriter);
 			fileWriter.close();
-			return true;
 		} catch (Exception e) {
-
 			System.out.println(e);
-			return false;
 		}
+		return exists;
 	}
 	/**
 	 * Function to write to the main file
+	 *
 	 * @param flight
-	 * @return
 	 */
 	protected boolean write_to_file(Flight flight) {
-
 		String yourFile = "flights.json";
 		File tmpDir = new File(yourFile);
 		boolean exists = tmpDir.exists();
-
 		try {
 			System.out.println(flight.getPassengers());
 			FileWriter fileWriter;
 			if (!exists) {
-				fileWriter = new FileWriter("flights.json");	
-			}
-
+                fileWriter = new FileWriter("flights.json");
+            }
 			Reader reader = new FileReader("flights.json");
 			Gson gson = new Gson();
+			java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {}.getType();
+			ArrayList<Flight> p;
 
-		      java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {
-	            }.getType();
-
-	            ArrayList<Flight> p = new ArrayList<Flight>();
-
-			
-			BufferedReader br = new BufferedReader(reader);
-			p = gson.fromJson(reader, listType);
+            p = gson.fromJson(reader, listType);
             if (p == null) {
-                p = new ArrayList<Flight>();
+                p = new ArrayList<>();
             }
             p.add(flight);
 			fileWriter = new FileWriter("flights.json");
 
 			gson.toJson(p, fileWriter);
 			fileWriter.close();
-			return true;
-		} catch (Exception e) {
-
-			System.out.println(e);
-			return false;
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+		return exists;
 	}
-
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					NewReservation frame = new NewReservation();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -238,12 +166,12 @@ public class NewReservation extends JFrame {
 				fileWriter = new FileWriter("temp_flight.json");
 				fileWriter.close();
 			}
-
 			Reader reader = new FileReader("temp_flight.json");
 			Gson gson = new Gson();
 
 			this.flight = gson.fromJson(reader, Flight.class);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		String mcdep = "";
 		if(flight.getType_of_flight().equals("Multi City Trip")) {
@@ -255,7 +183,7 @@ public class NewReservation extends JFrame {
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1280, 760);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBackground(new Color(102, 153, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -267,12 +195,10 @@ public class NewReservation extends JFrame {
 			public void mouseEntered(MouseEvent arg0) {
 				lblX.setBackground(Color.RED);
 			}
-
 			@Override
 			public void mouseExited(MouseEvent arg0) {
 				lblX.setBackground(new Color(204, 0, 0));
 			}
-
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				System.exit(0);
@@ -358,7 +284,8 @@ public class NewReservation extends JFrame {
 		rdbtnSelectFlight.setBounds(31, 7, 109, 23);
 		panelPromo.add(rdbtnSelectFlight);
 
-		labelPricePromo = new JLabel(String.format("%.2f$", (random.nextDouble() * 80 + 20)));
+        Random random = new Random();
+        labelPricePromo = new JLabel(String.format("%.2f$", (random.nextDouble() * 80 + 20)));
 		labelPricePromo.setFont(new Font("Century Gothic", Font.BOLD, 13));
 		labelPricePromo.setBounds(70, 40, 60, 23);
 		panelPromo.add(labelPricePromo);
@@ -375,14 +302,12 @@ public class NewReservation extends JFrame {
 		panel_3.add(panel_5);
 
 		radioButton = new JRadioButton("Select flight");
-		radioButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				rdbtnSelectFlight.setSelected(false);
-				radioButton.setSelected(true);
-				radioButton_1.setSelected(false);
-				getFlightPrice();
-			}
-		});
+		radioButton.addActionListener(e -> {
+            rdbtnSelectFlight.setSelected(false);
+            radioButton.setSelected(true);
+            radioButton_1.setSelected(false);
+            getFlightPrice();
+        });
 		radioButton.setHorizontalTextPosition(SwingConstants.LEADING);
 		radioButton.setHorizontalAlignment(SwingConstants.RIGHT);
 		radioButton.setFont(new Font("Century Gothic", Font.PLAIN, 11));
@@ -460,14 +385,12 @@ public class NewReservation extends JFrame {
 		panel_4.add(panel_7);
 
 		radioButton_2 = new JRadioButton("Select flight");
-		radioButton_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				radioButton_2.setSelected(true);
-				radioButton_3.setSelected(false);
-				radioButton_4.setSelected(false);
-				getFlightPrice();
-			}
-		});
+		radioButton_2.addActionListener(e -> {
+            radioButton_2.setSelected(true);
+            radioButton_3.setSelected(false);
+            radioButton_4.setSelected(false);
+            getFlightPrice();
+        });
 		radioButton_2.setHorizontalTextPosition(SwingConstants.LEADING);
 		radioButton_2.setHorizontalAlignment(SwingConstants.RIGHT);
 		radioButton_2.setFont(new Font("Century Gothic", Font.PLAIN, 11));
@@ -492,14 +415,12 @@ public class NewReservation extends JFrame {
 		panel_4.add(panel_8);
 
 		radioButton_3 = new JRadioButton("Select flight");
-		radioButton_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				radioButton_2.setSelected(false);
-				radioButton_3.setSelected(true);
-				radioButton_4.setSelected(false);
-				getFlightPrice();
-			}
-		});
+		radioButton_3.addActionListener(e -> {
+            radioButton_2.setSelected(false);
+            radioButton_3.setSelected(true);
+            radioButton_4.setSelected(false);
+            getFlightPrice();
+        });
 		radioButton_3.setHorizontalTextPosition(SwingConstants.LEADING);
 		radioButton_3.setHorizontalAlignment(SwingConstants.RIGHT);
 		radioButton_3.setFont(new Font("Century Gothic", Font.PLAIN, 11));
@@ -524,14 +445,12 @@ public class NewReservation extends JFrame {
 		panel_4.add(panel_9);
 
 		radioButton_4 = new JRadioButton("Select flight");
-		radioButton_4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				radioButton_2.setSelected(false);
-				radioButton_3.setSelected(false);
-				radioButton_4.setSelected(true);
-				getFlightPrice();
-			}
-		});
+		radioButton_4.addActionListener(e -> {
+            radioButton_2.setSelected(false);
+            radioButton_3.setSelected(false);
+            radioButton_4.setSelected(true);
+            getFlightPrice();
+        });
 		radioButton_4.setHorizontalTextPosition(SwingConstants.LEADING);
 		radioButton_4.setHorizontalAlignment(SwingConstants.RIGHT);
 		radioButton_4.setFont(new Font("Century Gothic", Font.PLAIN, 11));
@@ -571,11 +490,9 @@ public class NewReservation extends JFrame {
 		RoundAndMulti.add(panel_17);
 
 		JButton button = new JButton("Back");
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setVisible(false);
-				main.setVisible(true);
-			}
+		button.addActionListener(e -> {
+			setVisible(false);
+			main.setVisible(true);
 		});
 		button.setFont(new Font("Century Gothic", Font.BOLD, 13));
 		button.setBounds(15, 30, 100, 35);
@@ -628,11 +545,10 @@ public class NewReservation extends JFrame {
 		label_17.setFont(new Font("Century Gothic", Font.BOLD, 10));
 		label_17.setBackground(new Color(102, 153, 255));
 		label_17.setBounds(285, 90, 200, 45);
-		if(flight.getType_of_flight().equals("Round Trip")) {
+		if(flight.getType_of_flight().equals("Round Trip"))
 			label_17.setText(flight.getFrom() + " - " + flight.getTo()+" - "+flight.getFrom());
-		}else if(flight.getType_of_flight().equals("Multi City Trip")) {
+		else if(flight.getType_of_flight().equals("Multi City Trip"))
 			label_17.setText(flight.getFrom() + " - " + flight.getTo()+" & "+flight.getMulti_city_from()+" - "+flight.getFrom());
-		}
 		panel_16.add(label_17);
 
 		JLabel label_19 = new JLabel(flight.getType_of_flight());
@@ -642,16 +558,15 @@ public class NewReservation extends JFrame {
 		label_19.setBounds(285, 134, 100, 45);
 		panel_16.add(label_19);
 
-		label_18 = new JLabel();
+        JLabel label_18 = new JLabel();
 		label_18.setOpaque(true);
 		label_18.setFont(new Font("Century Gothic", Font.PLAIN, 11));
 		label_18.setBackground(new Color(102, 153, 255));
 		label_18.setBounds(385, 134, 100, 45);
-		if(flight.getNrOfPassengers()==1) {
+		if(flight.getNrOfPassengers()==1)
 			label_18.setText(flight.getNrOfPassengers()+" passenger");
-		}else {
+		else
 			label_18.setText(flight.getNrOfPassengers()+" passengers");
-		}
 		panel_16.add(label_18);
 
 		JSeparator separator_1 = new JSeparator();
@@ -681,13 +596,11 @@ public class NewReservation extends JFrame {
 		panel_10.add(panel_11);
 
 		 radioButton_5 = new JRadioButton("Select flight");
-			radioButton_5.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					radioButton_5.setSelected(true);
-					radioButton_6.setSelected(false);
-					radioButton_7.setSelected(false);
-					FlightPriceOneWay();
-				}
+			radioButton_5.addActionListener(e -> {
+				radioButton_5.setSelected(true);
+				radioButton_6.setSelected(false);
+				radioButton_7.setSelected(false);
+				FlightPriceOneWay();
 			});
 		radioButton_5.setHorizontalTextPosition(SwingConstants.LEADING);
 		radioButton_5.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -713,14 +626,12 @@ public class NewReservation extends JFrame {
 		panel_10.add(panel_12);
 
 		radioButton_6 = new JRadioButton("Select flight");
-		radioButton_6.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				radioButton_5.setSelected(false);
-				radioButton_6.setSelected(true);
-				radioButton_7.setSelected(false);
-				FlightPriceOneWay();
-			}
-		});
+		radioButton_6.addActionListener(e -> {
+            radioButton_5.setSelected(false);
+            radioButton_6.setSelected(true);
+            radioButton_7.setSelected(false);
+            FlightPriceOneWay();
+        });
 		radioButton_6.setHorizontalTextPosition(SwingConstants.LEADING);
 		radioButton_6.setHorizontalAlignment(SwingConstants.RIGHT);
 		radioButton_6.setFont(new Font("Century Gothic", Font.PLAIN, 11));
@@ -745,14 +656,12 @@ public class NewReservation extends JFrame {
 		panel_10.add(panel_13);
 
 		radioButton_7 = new JRadioButton("Select flight");
-		radioButton_7.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				radioButton_5.setSelected(false);
-				radioButton_6.setSelected(false);
-				radioButton_7.setSelected(true);
-				FlightPriceOneWay();
-			}
-		});
+		radioButton_7.addActionListener(e -> {
+            radioButton_5.setSelected(false);
+            radioButton_6.setSelected(false);
+            radioButton_7.setSelected(true);
+            FlightPriceOneWay();
+        });
 		radioButton_7.setHorizontalTextPosition(SwingConstants.LEADING);
 		radioButton_7.setHorizontalAlignment(SwingConstants.RIGHT);
 		radioButton_7.setFont(new Font("Century Gothic", Font.PLAIN, 11));
@@ -827,7 +736,7 @@ public class NewReservation extends JFrame {
 		lblNewLabel_5.setBounds(285, 134, 100, 45);
 		panel_14.add(lblNewLabel_5);
 
-		label_4 = new JLabel();
+        JLabel label_4 = new JLabel();
 		label_4.setOpaque(true);
 		label_4.setFont(new Font("Century Gothic", Font.PLAIN, 11));
 		label_4.setBackground(new Color(102, 153, 255));
@@ -850,28 +759,24 @@ public class NewReservation extends JFrame {
 		panel_15.setLayout(null);
 
 		JButton btnBack = new JButton("Back");
-		btnBack.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-				main.setVisible(true);
-			}
-		});
+		btnBack.addActionListener(e -> {
+            setVisible(false);
+            main.setVisible(true);
+        });
 		btnBack.setFont(new Font("Century Gothic", Font.BOLD, 13));
 		btnBack.setBounds(15, 30, 100, 35);
 		panel_15.add(btnBack);
 
 		JButton btnProceed = new JButton("PROCEED");
-		btnProceed.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				FlightPriceOneWay();
-				tabbedPane.setSelectedIndex(2);
-				tabbedPane.setEnabledAt(0, false);
-				tabbedPane.setEnabledAt(1, false);
-				tabbedPane.setEnabledAt(2, true);
-				tabbedPane.setEnabledAt(3, false);
-				tabbedPane.setEnabledAt(4, false);
-			}
-		});
+		btnProceed.addActionListener(e -> {
+            FlightPriceOneWay();
+            tabbedPane.setSelectedIndex(2);
+            tabbedPane.setEnabledAt(0, false);
+            tabbedPane.setEnabledAt(1, false);
+            tabbedPane.setEnabledAt(2, true);
+            tabbedPane.setEnabledAt(3, false);
+            tabbedPane.setEnabledAt(4, false);
+        });
 		btnProceed.setFont(new Font("Century Gothic", Font.BOLD, 13));
 		btnProceed.setBounds(405, 30, 100, 35);
 
@@ -966,44 +871,37 @@ public class NewReservation extends JFrame {
 		PassengerDetails.add(panel_18);
 
 		JButton button_2 = new JButton("Back");
-		button_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(flight.getType_of_flight().equals("One Way Trip")) {
-				tabbedPane.setSelectedIndex(1);
-				tabbedPane.setEnabledAt(0, false);
-				tabbedPane.setEnabledAt(1, true);
-				tabbedPane.setEnabledAt(2, false);
-				tabbedPane.setEnabledAt(3, false);
-				tabbedPane.setEnabledAt(4, false);
-				}else {
-					tabbedPane.setSelectedIndex(0);
-					tabbedPane.setEnabledAt(0, true);
-					tabbedPane.setEnabledAt(1, false);
-					tabbedPane.setEnabledAt(2, false);
-					tabbedPane.setEnabledAt(3, false);
-					tabbedPane.setEnabledAt(4, false);
-				}
-			}
-		});
+		button_2.addActionListener(arg0 -> {
+            if(flight.getType_of_flight().equals("One Way Trip")) {
+            	tabbedPane.setSelectedIndex(1);
+            	tabbedPane.setEnabledAt(0, false);
+            	tabbedPane.setEnabledAt(1, true);
+            }else {
+                tabbedPane.setSelectedIndex(0);
+                tabbedPane.setEnabledAt(0, true);
+                tabbedPane.setEnabledAt(1, false);
+            }
+            tabbedPane.setEnabledAt(2, false);
+            tabbedPane.setEnabledAt(3, false);
+            tabbedPane.setEnabledAt(4, false);
+        });
 		button_2.setFont(new Font("Century Gothic", Font.BOLD, 13));
 		button_2.setBounds(15, 30, 100, 35);
 		panel_18.add(button_2);
 
 		JButton button_3 = new JButton("PROCEED");
-		button_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(passengers.size() < flight.getNrOfPassengers()) {
-					JOptionPane.showMessageDialog(null, "Please enter all the passengers and then continue...");
-				}else {
-					tabbedPane.setSelectedIndex(4);
-					tabbedPane.setEnabledAt(0, false);
-					tabbedPane.setEnabledAt(1, false);
-					tabbedPane.setEnabledAt(2, false);
-					tabbedPane.setEnabledAt(3, false);
-					tabbedPane.setEnabledAt(4, true);
-				}
-			}
-		});
+		button_3.addActionListener(e -> {
+            if(passengers.size() < flight.getNrOfPassengers()) {
+                JOptionPane.showMessageDialog(null, "Please enter all the passengers and then continue...");
+            }else {
+                tabbedPane.setSelectedIndex(4);
+                tabbedPane.setEnabledAt(0, false);
+                tabbedPane.setEnabledAt(1, false);
+                tabbedPane.setEnabledAt(2, false);
+                tabbedPane.setEnabledAt(3, false);
+                tabbedPane.setEnabledAt(4, true);
+            }
+        });
 		button_3.setFont(new Font("Century Gothic", Font.BOLD, 13));
 		button_3.setBounds(405, 30, 100, 35);
 
@@ -1136,7 +1034,7 @@ public class NewReservation extends JFrame {
 		textFieldPhone.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent arg0) {
-				if (textFieldPhone.getText().equals("")) {
+				if (textFieldPhone.getText().isEmpty()) {
 					textFieldPhone.setText("+(prefix)(phone number)");
 				}
 			}
@@ -1200,7 +1098,7 @@ public class NewReservation extends JFrame {
 		textFieldEmail.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
-				String string = "^[a-zA-Z0-9]{5,20}[@](?=.*[a-zA-Z]).{4,10}[.](?=.*[a-zA-Z]).{2,5}$";
+				String string = "^[a-zA-Z0-9]{5,20}@(?=.*[a-zA-Z]).{4,10}[.](?=.*[a-zA-Z]).{2,5}$";
 				Pattern pt = Pattern.compile(string);
 				Matcher match = pt.matcher(textFieldEmail.getText());
 				if (!match.matches()) {
@@ -1452,47 +1350,34 @@ public class NewReservation extends JFrame {
 		Payment.add(lblNewLabel_6);
 
 		JButton btnConfirmPay = new JButton("CONFIRM & PAY");
-		btnConfirmPay.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(textFieldCard.getText().equals("") || textField.getText().equals("")
-						|| textFieldCard.getText().equals("xxxx-xxxx-xxxx-xxxx") || txtCvv.getText().equals("CVV")
-						|| comboBox.getSelectedItem().equals("") || comboBox_1.getSelectedItem().equals("")
-						|| txtCvv.getText().equals("") || !chckbxIHaveRead.isSelected()) {
-					Message.setText("Please fill all information");
-				}else {
-					/**
-					 * Saves the payment details in the file
-					 */
-					String card_holder = textField.getText().toString();
-					String card_nr = textFieldCard.getText().toString();
-					flight.setCard_holder(card_holder);
-					flight.setCard_number(card_nr);
-					flight.setPassengers(passengers);
-					write_to_file(flight);
-					JOptionPane.showMessageDialog(null, "Your ticket with booking number "+flight.getBooking_number()+" is issued!");
-					/**
-					 * Check if the booking number is the same with the one saved and display that booking
-					 */
-					Flight result = null;
-					ArrayList<Flight> data = getData();
-					for(Flight temp_flight:data) {
-						if(result!=null) {
-							break;
-						}
-								if(temp_flight.getBooking_number().equalsIgnoreCase(flight.getBooking_number())) {
-									result = temp_flight;
-									break;
-								}
-							}
-					write_to_temp_file(result);
-					setVisible(false);
-					MyBooking mb = new MyBooking();
-					mb.setVisible(true);
-						}
-				
-					}
-					
-		});
+		btnConfirmPay.addActionListener(e -> {
+            if(textFieldCard.getText().isEmpty() || textField.getText().isEmpty()
+                    || textFieldCard.getText().equals("xxxx-xxxx-xxxx-xxxx") || txtCvv.getText().equals("CVV")
+                    || Objects.equals(comboBox.getSelectedItem(),"") || Objects.equals(comboBox_1.getSelectedItem(), "")
+                    || txtCvv.getText().isEmpty() || !chckbxIHaveRead.isSelected()) {
+                Message.setText("Please fill all information");
+            }else {
+                String card_holder = textField.getText();
+                String card_nr = textFieldCard.getText();
+                flight.setCard_holder(card_holder);
+                flight.setCard_number(card_nr);
+                flight.setPassengers(passengers);
+                write_to_file(flight);
+                JOptionPane.showMessageDialog(null, "Your ticket with booking number "+flight.getBooking_number()+" is issued!");
+				Flight result = null;
+                ArrayList<Flight> data = getData();
+                for(Flight temp_flight:data) {
+					if(temp_flight.getBooking_number().equalsIgnoreCase(flight.getBooking_number())) {
+						result = temp_flight;
+						break;
+                    }
+                }
+                write_to_temp_file(result);
+                setVisible(false);
+                MyBooking mb = new MyBooking();
+                mb.setVisible(true);
+            }
+        });
 		btnConfirmPay.setBounds(136, 445, 164, 35);
 		Payment.add(btnConfirmPay);
 		btnConfirmPay.setFont(new Font("Century Gothic", Font.BOLD, 13));
@@ -1505,7 +1390,7 @@ public class NewReservation extends JFrame {
 					txtCvv.setText("");
 			}
 			public void focusLost(FocusEvent arg0) {
-				if(txtCvv.getText().equals(""))
+				if(txtCvv.getText().isEmpty())
 					txtCvv.setText("CVV");
 			}
 		});
@@ -1576,88 +1461,76 @@ public class NewReservation extends JFrame {
 		lblNewLabel_1.setBounds(300, 10, 680, 35);
 		panel_2.add(lblNewLabel_1);
 
-		button_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				getFlightPrice();
-				tabbedPane.setSelectedIndex(2);
-				tabbedPane.setEnabledAt(0, false);
-				tabbedPane.setEnabledAt(1, false);
-				tabbedPane.setEnabledAt(2, true);
-				tabbedPane.setEnabledAt(3, false);
-				tabbedPane.setEnabledAt(4, false);
-			}
-		});
+		button_1.addActionListener(arg0 -> {
+            getFlightPrice();
+            tabbedPane.setSelectedIndex(2);
+            tabbedPane.setEnabledAt(0, false);
+            tabbedPane.setEnabledAt(1, false);
+            tabbedPane.setEnabledAt(2, true);
+            tabbedPane.setEnabledAt(3, false);
+            tabbedPane.setEnabledAt(4, false);
+        });
 
 		if (flight.getType_of_flight().equals("One Way Trip")) {
-
 			tabbedPane.setSelectedIndex(1);
 			tabbedPane.setEnabledAt(0, false);
 			tabbedPane.setEnabledAt(1, true);
-			tabbedPane.setEnabledAt(2, false);
-			tabbedPane.setEnabledAt(3, false);
-			tabbedPane.setEnabledAt(4, false);
-			
-		}
+        }
 		else {
 			tabbedPane.setSelectedIndex(0);
 			tabbedPane.setEnabledAt(0, true);
 			tabbedPane.setEnabledAt(1, false);
-			tabbedPane.setEnabledAt(2, false);
-			tabbedPane.setEnabledAt(3, false);
-			tabbedPane.setEnabledAt(4, false);
-		}
+        }
+        tabbedPane.setEnabledAt(2, false);
+        tabbedPane.setEnabledAt(3, false);
+        tabbedPane.setEnabledAt(4, false);
 
-		buttonAdd.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (textFieldFName.getText().isEmpty() || textFieldLName.getText().isEmpty()
-						|| textFieldResidence.getText().isEmpty() || textFieldEmail.getText().isEmpty()
-						|| textFieldPhone.getText().isEmpty() || textFieldCountry.getText().isEmpty()
-						|| comboBoxSuffix.getSelectedItem().equals("") || dateChooserBirthday.getDate().equals("")
-						|| textFieldPhone.getText().equals("+(prefix)(phone number)")) {
-					message.setText("Please fill all mandatory data");
-					lblSuffix.setForeground(Color.RED);
-					lblFirstName.setForeground(Color.RED);
-					lblLastName.setForeground(Color.RED);
-					lblDateOfBirth.setForeground(Color.RED);
-					lblResidenceCountry.setForeground(Color.RED);
-					lblEmail.setForeground(Color.RED);
-					lblPhoneNumber.setForeground(Color.RED);
-					lblCountry.setForeground(Color.RED);
-				} else {
-					/**
-					 * If the arrayList size is less than the number entered by the user you should enter more passengers
-					 */
-					if(passengers.size() < flight.getNrOfPassengers()) {
-						String first_name = textFieldFName.getText();
-						String last_name = textFieldLName.getText();
-						String email = textFieldEmail.getText();
-						String suffix = comboBoxSuffix.getSelectedItem().toString();
-						String phone_no = textFieldPhone.getText();
-						String country = textFieldCountry.getText();
-						String city = textFieldCity.getText();
-						String street = textFieldStreet.getText();
-						String residence_country = textFieldResidence.getText();
-						passenger = new Passenger(suffix, first_name, last_name, email, city, street, country, phone_no);
-						passengers.add(passenger);
-						flight.setPassengers(passengers);
-						textFieldFName.setText("");
-						textFieldLName.setText("");
-						comboBoxSuffix.setSelectedIndex(0);
-						textFieldPhone.setText("+(prefix)(phone number)");
-						textFieldCountry.setText("");
-						textFieldCity.setText("");
-						textFieldStreet.setText("");
-						textFieldResidence.setText("");
-						dateChooserBirthday.setDate(null);
-						textFieldEmail.setText("");
-					}
-					else {
-						message.setText("You have entered all the passengers. Please proceed with the payment!");
-						buttonAdd.setEnabled(false);
-					}
-				}
-			}
-		});
+        buttonAdd.addActionListener(arg0 -> {
+            if (textFieldFName.getText().isEmpty() || textFieldLName.getText().isEmpty()
+                    || textFieldResidence.getText().isEmpty() || textFieldEmail.getText().isEmpty()
+                    || textFieldPhone.getText().isEmpty() || textFieldCountry.getText().isEmpty()
+                    || Objects.equals(comboBoxSuffix.getSelectedItem(), "") || Objects.isNull(dateChooserBirthday.getDate())
+                    || textFieldPhone.getText().equals("+(prefix)(phone number)")) {
+                message.setText("Please fill all mandatory data");
+                lblSuffix.setForeground(Color.RED);
+                lblFirstName.setForeground(Color.RED);
+                lblLastName.setForeground(Color.RED);
+                lblDateOfBirth.setForeground(Color.RED);
+                lblResidenceCountry.setForeground(Color.RED);
+                lblEmail.setForeground(Color.RED);
+                lblPhoneNumber.setForeground(Color.RED);
+                lblCountry.setForeground(Color.RED);
+            } else {
+				//If the arrayList size is less than the number entered by the user you should enter more passengers
+                if(passengers.size() < flight.getNrOfPassengers()) {
+                    String first_name = textFieldFName.getText();
+                    String last_name = textFieldLName.getText();
+                    String email = textFieldEmail.getText();
+                    String suffix = comboBoxSuffix.getSelectedItem().toString();
+                    String phone_no = textFieldPhone.getText();
+                    String country = textFieldCountry.getText();
+                    String city = textFieldCity.getText();
+                    String street = textFieldStreet.getText();
+                    passenger = new Passenger(suffix, first_name, last_name, email, city, street, country, phone_no);
+                    passengers.add(passenger);
+                    flight.setPassengers(passengers);
+                    textFieldFName.setText("");
+                    textFieldLName.setText("");
+                    comboBoxSuffix.setSelectedIndex(0);
+                    textFieldPhone.setText("+(prefix)(phone number)");
+                    textFieldCountry.setText("");
+                    textFieldCity.setText("");
+                    textFieldStreet.setText("");
+                    textFieldResidence.setText("");
+                    dateChooserBirthday.setDate(null);
+                    textFieldEmail.setText("");
+                }
+                else {
+                    message.setText("You have entered all the passengers. Please proceed with the payment!");
+                    buttonAdd.setEnabled(false);
+                }
+            }
+        });
 	}
 	/**
 	 * Function to get the total price
@@ -1667,22 +1540,18 @@ public class NewReservation extends JFrame {
 		if (rdbtnSelectFlight.isSelected()) {
 			flight_price += Double.parseDouble(
 					labelPricePromo.getText().substring(0, labelPricePromo.getText().length() - 1));
-
 		}
 		if (radioButton.isSelected()) {
 			flight_price += Double
 					.parseDouble(labelPriceEco.getText().substring(0, labelPricePromo.getText().length() - 1));
-
 		}
 		if (radioButton_1.isSelected()) {
 			flight_price += Double
 					.parseDouble(labelBusiness.getText().substring(0, labelPricePromo.getText().length() - 1));
-
 		}
 		if (radioButton_2.isSelected()) {
 			flight_price += Double.parseDouble(
 					label_3.getText().substring(0, label_3.getText().length() - 1));
-
 		}
 		if (radioButton_3.isSelected()) {
 			flight_price += Double.parseDouble(
@@ -1702,12 +1571,10 @@ public class NewReservation extends JFrame {
 		if (radioButton_5.isSelected()) {
 			flight_price += Double
 					.parseDouble(label_12.getText().substring(0, label_12.getText().length() - 1));
-
 		}
 		if (radioButton_6.isSelected()) {
 			flight_price += Double.parseDouble(
 					label_14.getText().substring(0, label_14.getText().length() - 1));
-
 		}
 		if (radioButton_7.isSelected()) {
 			flight_price += Double.parseDouble(

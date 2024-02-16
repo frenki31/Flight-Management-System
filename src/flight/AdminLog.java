@@ -1,8 +1,5 @@
 package flight;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -25,32 +22,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.SystemColor;
 /**
- * Class AdminLog contains 3 administrators that can login to the admin page
+ * Class AdminLog contains 3 administrators that can log in to the admin page
  * @author user
  */
 public class AdminLog extends JFrame {
 
-	private JPanel contentPane;
-	private JTextField txtUsername;
-	private JPasswordField pwdPassword;
-	private JLabel message;
+    private final JTextField txtUsername;
+	private final JPasswordField pwdPassword;
+	private final JLabel message;
 	Display main = new Display();
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AdminLog frame = new AdminLog();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -58,7 +38,7 @@ public class AdminLog extends JFrame {
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(200, 75, 900, 600);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBackground(new Color(153, 153, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -83,7 +63,7 @@ public class AdminLog extends JFrame {
 			}
 			@Override
 			public void focusLost(FocusEvent e) {
-				if(txtUsername.getText().equals("")) {
+				if(txtUsername.getText().isEmpty()) {
 					txtUsername.setText("Username");
 				}
 				else {
@@ -100,7 +80,7 @@ public class AdminLog extends JFrame {
 		panel.add(txtUsername);
 		
 		JLabel label = new JLabel("");
-		label.setIcon(new ImageIcon("C:\\Users\\user\\eclipse-workspace\\FlightManagementSystem\\image\\108003960_735506757199645_4838703568523846670_n.png"));
+//		label.setIcon(new ImageIcon("src\\image\\admin.png"));
 		label.setBounds(10, 5, 30, 30);
 		panel.add(label);
 		
@@ -126,7 +106,7 @@ public class AdminLog extends JFrame {
 			}
 			@Override
 			public void focusLost(FocusEvent e) {
-				if(pwdPassword.getText().equals("")) {
+				if(pwdPassword.getText().isEmpty()) {
 					pwdPassword.setText("Password");
 					pwdPassword.setEchoChar((char)0);
 				}
@@ -144,12 +124,12 @@ public class AdminLog extends JFrame {
 		panel_1.add(pwdPassword);
 		
 		JLabel label_1 = new JLabel("");
-		label_1.setIcon(new ImageIcon("C:\\Users\\user\\eclipse-workspace\\FlightManagementSystem\\image\\48420605_461743121021463_8816441078312861696_n.png"));
+//		label_1.setIcon(new ImageIcon("C:\\Users\\user\\eclipse-workspace\\FlightManagementSystem\\image\\48420605_461743121021463_8816441078312861696_n.png"));
 		label_1.setBounds(10, 5, 30, 30);
 		panel_1.add(label_1);
 		
 		JLabel label_2 = new JLabel("");
-		label_2.setIcon(new ImageIcon("C:\\Users\\user\\eclipse-workspace\\FlightManagementSystem\\image\\53333246_367963507376755_7415617853837017088_n.png"));
+//		label_2.setIcon(new ImageIcon("C:\\Users\\user\\eclipse-workspace\\FlightManagementSystem\\image\\53333246_367963507376755_7415617853837017088_n.png"));
 		label_2.setBounds(375, 100, 150, 150);
 		contentPane.add(label_2);
 		
@@ -161,16 +141,14 @@ public class AdminLog extends JFrame {
 		JButton btnLogin = new JButton("LOGIN");
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(txtUsername.getText().equals("Frenki")&& pwdPassword.getText().equals("frenki123") 
-						|| txtUsername.getText().equals("Kevin")&& pwdPassword.getText().equals("kevin123") 
-						|| txtUsername.getText().equals("Elvis")&& pwdPassword.getText().equals("elvisbarjami")) {
+				if(txtUsername.getText().equals("Frenki")&& pwdPassword.getText().equals("frenki123")) {
 					message.setText("");
 					JOptionPane.showMessageDialog(null, "Welcome back " + txtUsername.getText());
 					setVisible(false);
 					Admin admin = new Admin();
 					admin.setVisible(true);
 				}
-				else if(txtUsername.getText().equals("")|| txtUsername.getText().equals("Username")||pwdPassword.getText().equals("")||pwdPassword.getText().equals("Password")) {
+				else if(txtUsername.getText().isEmpty() || txtUsername.getText().equals("Username")|| pwdPassword.getText().isEmpty() ||pwdPassword.getText().equals("Password")) {
 					message.setText("Please put your information");
 				}
 				else {
@@ -186,12 +164,10 @@ public class AdminLog extends JFrame {
 		contentPane.add(btnLogin);
 		
 		JButton btnReset = new JButton("Reset");
-		btnReset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				pwdPassword.setText("");
-				txtUsername.setText("");
-			}
-		});
+		btnReset.addActionListener(arg0 -> {
+            pwdPassword.setText("");
+            txtUsername.setText("");
+        });
 		btnReset.setForeground(Color.WHITE);
 		btnReset.setFont(new Font("Century Gothic", Font.BOLD, 15));
 		btnReset.setBorder(new LineBorder(new Color(51, 51, 255), 1, true));
@@ -206,12 +182,10 @@ public class AdminLog extends JFrame {
 		contentPane.add(message);
 		
 		JButton btnGoBack = new JButton("GO BACK");
-		btnGoBack.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				setVisible(false);
-				main.setVisible(true);
-			}
-		});
+		btnGoBack.addActionListener(arg0 -> {
+            setVisible(false);
+            main.setVisible(true);
+        });
 		btnGoBack.setForeground(Color.WHITE);
 		btnGoBack.setFont(new Font("Century Gothic", Font.BOLD, 15));
 		btnGoBack.setBorder(new LineBorder(new Color(51, 51, 255), 1, true));

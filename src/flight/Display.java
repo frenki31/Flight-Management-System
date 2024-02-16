@@ -1,16 +1,11 @@
 package flight;
 
-import java.awt.Adjustable;
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import org.w3c.dom.ls.LSResourceResolver;
-
-import javax.swing.JMenuBar;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Font;
@@ -18,11 +13,7 @@ import java.awt.Color;
 import javax.swing.border.LineBorder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Reader;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,9 +26,10 @@ import javax.swing.JRadioButton;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.Cursor;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.toedter.calendar.JDateChooser;
+import inheritance.Flight;
+import inheritance.Passenger;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -45,14 +37,16 @@ import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.border.MatteBorder;
 import java.awt.Panel;
+import java.util.Objects;
 import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
-import javax.swing.border.SoftBevelBorder;
-import javax.swing.border.BevelBorder;
 import javax.swing.JScrollPane;
-import javax.swing.JToggleButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+
+import static flight.NewReservation.getFlights;
+import static flight.NewReservation.tempFlight;
+
 /**
  * Class Display is the user interface and the main one because from here the user can choose the flight 
  * information and then go on with booking the ticket
@@ -60,115 +54,39 @@ import javax.swing.SpinnerNumberModel;
  */
 public class Display extends JFrame {
 
-	private JPanel contentPane;
-	private JTextField textField_1;
-	private JDateChooser dateChooserReturn;
-	private JRadioButton rdbtnOneWayTrip;
-	private JRadioButton rdbtnMulticityTrip;
-	private JRadioButton radioButtonMulti;
-	private JRadioButton radioButtonOneWay;
-	private JRadioButton radioButtonRound;
-	private JSpinner AdultSpin;
-	private JSpinner ChildSpin;
-	private JSpinner InfantSpin;
+    private final JTextField textField_1, textField;
+	private final JDateChooser dateChooserReturn, dateChooser, dateChooser_1;
+	private final JRadioButton rdbtnOneWayTrip, rdbtnMulticityTrip, radioButtonMulti, radioButtonOneWay, radioButtonRound;
+	private final JSpinner AdultSpin, ChildSpin, InfantSpin, spinner, spinner_1, spinner_2;
 	protected Flight flight;
-	private JLabel lblmessage;
-	private JComboBox comboBox_2;
-	private JComboBox comboBox_3;
-	private JDateChooser dateChooser;
-	private JDateChooser dateChooser_1;
-	private JSpinner spinner;
-	private JSpinner spinner_1;
-	private JSpinner spinner_2;
-	private JLabel message;
-	private JComboBox ToBox;
-	private JComboBox FromBox;
-	private JTextField textField;
-
+	private final JLabel lblmessage, message;
+	private final JComboBox comboBox_2, comboBox_3, ToBox, FromBox;
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Display frame = new Display();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
+		EventQueue.invokeLater(() -> {
+            try {
+                Display frame = new Display();
+                frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
 	}
-
-	/**
-	 * Create the frame.
-	 */
-	/**
-	 * Method to write into the temporary json file
-	 * @param flight
-	 * @return
-	 */
 	protected boolean write_to_temp_file(Flight flight) {
-	
-		String yourFile = "temp_flight.json";
-		File tmpDir = new File(yourFile);
-		boolean exists = tmpDir.exists();
-
-		try {
-			FileWriter fileWriter;
-			if (!exists) {
-				fileWriter = new FileWriter("temp_flight.json");
-				fileWriter.close();
-			}
-
-			Reader reader = new FileReader("temp_flight.json");
-			Gson gson = new Gson();
-
-			BufferedReader br = new BufferedReader(reader);
-
-			fileWriter = new FileWriter("temp_flight.json");
-
-			gson.toJson(flight, fileWriter);
-			fileWriter.close();
-			return true;
-		} catch (Exception e) {
-		
-			System.out.println(e);
-			return false;
-		}
+		return tempFlight(flight);
 	}
-	/**
-	 * Method to get flight information from the file where we put information to
-	 * @return
-	 */
 	public ArrayList<Flight> getData() {
 		String yourFile = "flights.json";
 		File tmpDir = new File(yourFile);
 		boolean exists = tmpDir.exists();
-
 		try {
-			  java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {
-	            }.getType();
-
-	            ArrayList<Flight> p = new ArrayList<Flight>();
-
-			FileWriter fileWriter;
-			if (!exists) {
-				fileWriter = new FileWriter("flights.json");
-				fileWriter.close();
-			}
-
-			Reader reader = new FileReader("flights.json");
-			Gson gson = new Gson();
-
-			BufferedReader br = new BufferedReader(reader);
-			p = gson.fromJson(reader, listType);
-		
-			return p;
+			java.lang.reflect.Type listType = new TypeToken<ArrayList<Flight>>() {}.getType();
+            return getFlights(exists, listType);
 		} catch (Exception ex) {
 			System.out.println(ex);
-			return new ArrayList<Flight>();
+			return new ArrayList<>();
 		}
 	}
 	/**
@@ -178,7 +96,7 @@ public class Display extends JFrame {
 		setUndecorated(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(0, 0, 1280, 760);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBackground(new Color(102, 153, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -194,7 +112,6 @@ public class Display extends JFrame {
 			public void mouseExited(MouseEvent arg0) {
 				lblX.setBackground(new Color(204, 0, 0));
 			}
-
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				System.exit(0);
@@ -239,7 +156,7 @@ public class Display extends JFrame {
 		FromBox = new JComboBox();
 		FromBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(FromBox.getSelectedItem().toString().equals(ToBox.getSelectedItem().toString())){
+				if(FromBox.getSelectedItem().equals(ToBox.getSelectedItem())){
 					FromBox.setSelectedIndex(0);
 				}
 			}
@@ -256,7 +173,7 @@ public class Display extends JFrame {
 		ToBox = new JComboBox();
 		ToBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(FromBox.getSelectedItem().toString().equals(ToBox.getSelectedItem().toString())){
+				if(FromBox.getSelectedItem().equals(ToBox.getSelectedItem())){
 					ToBox.setSelectedIndex(0);
 				}
 			}
@@ -348,14 +265,10 @@ public class Display extends JFrame {
 		JButton btnSearch = new JButton("SEARCH");
 		btnSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (FromBox.getSelectedItem().equals("From") || ToBox.getSelectedItem().equals("To")
-						|| dateChooserGoing.getDate().equals("")
-						|| AdultSpin.getValue().equals("0")) {
+				if (Objects.equals(FromBox.getSelectedItem(), "From") || Objects.equals(ToBox.getSelectedItem(), "To")
+						|| Objects.isNull(dateChooserGoing.getDate()) || AdultSpin.getValue().equals("0")) {
 					lblmessage.setText("Please fill in every field");
 				} else {
-					/**
-					 * Save all the information into a flight class object which is then saved in the file
-					 */
 					String to = ToBox.getSelectedItem().toString();
 					String from = FromBox.getSelectedItem().toString();
 					Date second_flight_date;
@@ -373,17 +286,12 @@ public class Display extends JFrame {
 					int nr_of_infants = (Integer) InfantSpin.getValue();
 					System.out.println(rdbtnRoundTrip.isSelected());
 					String type_of_flight;
-					if(rdbtnRoundTrip.isSelected()) {
+					if(rdbtnRoundTrip.isSelected())
 						type_of_flight="Round Trip";
-						
-					}
-					else if(rdbtnOneWayTrip.isSelected()) {
-			type_of_flight = "One Way Trip";
-
-					}
-					else {
+					else if(rdbtnOneWayTrip.isSelected())
+						type_of_flight = "One Way Trip";
+					else
 						type_of_flight = "Multi City Trip";
-					}
 			        flight = new Flight(to,from,first_flight,second_flight,nr_of_adults,nr_of_children,nr_of_infants,type_of_flight);
 			        if(write_to_temp_file(flight)) {
 					NewReservation newReservation = new NewReservation();
@@ -461,36 +369,34 @@ public class Display extends JFrame {
 		MyBookingsPane.add(lblMyBookingg);
 
 		JButton btnNewButton = new JButton("RETRIEVE");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				/**
-				 * Button Retrieve checks if the last name and booking number entered by the user match those
-				 * inside the file and then displys the booking
-				 */
-				String last_name = textField.getText();
-				String booking_nr = textField_1.getText();
-				Flight result = null;
-				ArrayList<Flight> data = getData();
-				for(Flight temp_flight:data) {
-					if(result!=null) {
-						break;
-					}
-					if(temp_flight.getPassengers()!= null) {
-						for(Passenger pass:temp_flight.getPassengers()) {
-							if(pass.getLast_name().equalsIgnoreCase(last_name) && temp_flight.getBooking_number().equalsIgnoreCase(booking_nr)) {
-								result = temp_flight;
-								break;
-							}
-						}
-						
-					}
-				}
-				write_to_temp_file(result);
-				setVisible(false);
-				MyBooking mb = new MyBooking();
-				mb.setVisible(true);
-			}
-		});
+		btnNewButton.addActionListener(e -> {
+            /**
+             * Button Retrieve checks if the last name and booking number entered by the user match those
+             * inside the file and then displys the booking
+             */
+            String last_name = textField.getText();
+            String booking_nr = textField_1.getText();
+            Flight result = null;
+            ArrayList<Flight> data = getData();
+            for(Flight temp_flight:data) {
+                if(result!=null) {
+                    break;
+                }
+                if(temp_flight.getPassengers()!= null) {
+                    for(Passenger pass:temp_flight.getPassengers()) {
+                        if(pass.getLast_name().equalsIgnoreCase(last_name) && temp_flight.getBooking_number().equalsIgnoreCase(booking_nr)) {
+                            result = temp_flight;
+                            break;
+                        }
+                    }
+
+                }
+            }
+            write_to_temp_file(result);
+            setVisible(false);
+            MyBooking mb = new MyBooking();
+            mb.setVisible(true);
+        });
 		btnNewButton.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(255, 255, 0)));
 		btnNewButton.setBackground(new Color(255, 204, 51));
 		btnNewButton.setFont(new Font("Century Gothic", Font.BOLD, 13));
@@ -562,21 +468,18 @@ public class Display extends JFrame {
 		panel_1.add(radioButtonOneWay);
 
 		radioButtonMulti = new JRadioButton("Multi-City Trip");
-		radioButtonMulti.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				radioButtonOneWay.setSelected(false);
-				radioButtonRound.setSelected(false);
-				radioButtonMulti.setSelected(true);
-				rdbtnRoundTrip.setSelected(false);
-				rdbtnOneWayTrip.setSelected(false);
-				rdbtnMulticityTrip.setSelected(true);
-				TabbedPane.setEnabledAt(0, false);
-				TabbedPane.setEnabledAt(1, false);
-				TabbedPane.setEnabledAt(2, true);
-				TabbedPane.setSelectedIndex(2);
-			}
-		});
+		radioButtonMulti.addActionListener(arg0 -> {
+            radioButtonOneWay.setSelected(false);
+            radioButtonRound.setSelected(false);
+            radioButtonMulti.setSelected(true);
+            rdbtnRoundTrip.setSelected(false);
+            rdbtnOneWayTrip.setSelected(false);
+            rdbtnMulticityTrip.setSelected(true);
+            TabbedPane.setEnabledAt(0, false);
+            TabbedPane.setEnabledAt(1, false);
+            TabbedPane.setEnabledAt(2, true);
+            TabbedPane.setSelectedIndex(2);
+        });
 		radioButtonMulti.setSelected(true);
 		radioButtonMulti.setFont(new Font("Century Gothic", Font.PLAIN, 13));
 		radioButtonMulti.setBounds(1000, 40, 109, 23);
@@ -849,7 +752,7 @@ public class Display extends JFrame {
 		JLabel label_13 = new JLabel("");
 		label_13.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Milan", TitledBorder.TRAILING,
 				TitledBorder.BOTTOM, new Font("Century Gothic", Font.PLAIN, 14), new Color(255, 255, 255)));
-		label_13.setIcon(new ImageIcon("C:\\Users\\user\\Desktop\\image\\d5ea30510f869e4e7192c7f093d3c258.jpg"));
+		label_13.setIcon(new ImageIcon("src\\image\\milan.jpg"));
 		label_13.setBounds(54, 423, 150, 200);
 		contentPane.add(label_13);
 
@@ -858,16 +761,14 @@ public class Display extends JFrame {
 		contentPane.add(scrollPane);
 
 		JLabel label_14 = new JLabel("");
-		label_14.setIcon(new ImageIcon(
-				"C:\\Users\\user\\Desktop\\image\\f0a828efd775ea86bb5f7b5d872ce45a--roma-italia-bella-italia.jpg"));
+		label_14.setIcon(new ImageIcon("src\\image\\rome.jpg"));
 		label_14.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Rome", TitledBorder.TRAILING,
 				TitledBorder.BOTTOM, new Font("Century Gothic", Font.PLAIN, 14), new Color(255, 255, 255)));
 		label_14.setBounds(258, 423, 150, 200);
 		contentPane.add(label_14);
 
 		JLabel label_15 = new JLabel("");
-		label_15.setIcon(new ImageIcon(
-				"C:\\Users\\user\\Desktop\\image\\5589695-960_475460738-blue-mosque-and-hagia-sophia-in-istanbul_p.jpg"));
+		label_15.setIcon(new ImageIcon("src\\image\\istanbul.jpg"));
 		label_15.setBorder(
 				new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Istanbul", TitledBorder.TRAILING,
 						TitledBorder.BOTTOM, new Font("Century Gothic", Font.PLAIN, 14), new Color(255, 255, 255)));
@@ -875,54 +776,47 @@ public class Display extends JFrame {
 		contentPane.add(label_15);
 
 		JLabel label_16 = new JLabel("");
-		label_16.setIcon(new ImageIcon("C:\\Users\\user\\Desktop\\image\\pisa-leaning-tower1.jpg"));
+		label_16.setIcon(new ImageIcon("src\\image\\pisa.jpg"));
 		label_16.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Pisa", TitledBorder.TRAILING,
 				TitledBorder.BOTTOM, new Font("Century Gothic", Font.PLAIN, 14), new Color(255, 255, 255)));
 		label_16.setBounds(666, 423, 150, 200);
 		contentPane.add(label_16);
 
 		JLabel label_17 = new JLabel("");
-		label_17.setIcon(new ImageIcon(
-				"C:\\Users\\user\\Desktop\\image\\View-of-Verona-with-Ponte-Pietra-Verona-Veneto-Italy-rossiwrites.com_.jpg"));
+		label_17.setIcon(new ImageIcon("src\\image\\verona.jpg"));
 		label_17.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Verona", TitledBorder.TRAILING,
 				TitledBorder.BOTTOM, new Font("Century Gothic", Font.PLAIN, 14), new Color(255, 255, 255)));
 		label_17.setBounds(870, 423, 150, 200);
 		contentPane.add(label_17);
 
 		JLabel label_18 = new JLabel("");
-		label_18.setIcon(new ImageIcon("C:\\Users\\user\\Desktop\\image\\0eef8f57a13ea2b6099645c935d60d4e.jpg"));
+		label_18.setIcon(new ImageIcon("src\\image\\bergamo.jpg"));
 		label_18.setBorder(
 				new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Bergamo", TitledBorder.TRAILING,
 						TitledBorder.BOTTOM, new Font("Century Gothic", Font.PLAIN, 14), new Color(255, 255, 255)));
 		label_18.setBounds(1074, 423, 150, 200);
 		contentPane.add(label_18);
-		comboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				/**
-				 * Checks if the same place is chosen for the departure and arrival
-				 */
-				if(comboBox.getSelectedItem().toString().equals(comboBox_1.getSelectedItem().toString())){
-					comboBox.setSelectedIndex(0);
-				}
-				if(comboBox.getSelectedItem().toString().equals(comboBox_2.getSelectedItem().toString())){
-					comboBox.setSelectedIndex(0);
-				}
-				comboBox_3.setSelectedIndex(comboBox.getSelectedIndex());
-			}
-		});
-		comboBox_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(comboBox.getSelectedItem().toString().equals(comboBox_1.getSelectedItem().toString())){
-					comboBox_1.setSelectedIndex(0);
-				}
-			}
-		});
-		comboBox_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(comboBox.getSelectedItem().toString().equals(comboBox_2.getSelectedItem().toString())){
-					comboBox_2.setSelectedIndex(0);
-				}
-			}
-		});
+		comboBox.addActionListener(e -> {
+            /**
+             * Checks if the same place is chosen for the departure and arrival
+             */
+            if(comboBox.getSelectedItem().equals(comboBox_1.getSelectedItem())){
+                comboBox.setSelectedIndex(0);
+            }
+            if(comboBox.getSelectedItem().equals(comboBox_2.getSelectedItem())){
+                comboBox.setSelectedIndex(0);
+            }
+            comboBox_3.setSelectedIndex(comboBox.getSelectedIndex());
+        });
+		comboBox_1.addActionListener(e -> {
+            if(comboBox.getSelectedItem().equals(comboBox_1.getSelectedItem())){
+                comboBox_1.setSelectedIndex(0);
+            }
+        });
+		comboBox_2.addActionListener(e -> {
+            if(comboBox.getSelectedItem().equals(comboBox_2.getSelectedItem())){
+                comboBox_2.setSelectedIndex(0);
+            }
+        });
 	}
 }
