@@ -123,11 +123,6 @@ public class MyBooking extends JFrame {
 		lblNewLabel_2.setBounds(879, 40, 77, 24);
 		panel.add(lblNewLabel_2);
 		
-		JLabel labelLastName = new JLabel(flight.getPassengers().get(0).getLast_name());
-		labelLastName.setFont(new Font("Century Gothic", Font.PLAIN, 14));
-		labelLastName.setBounds(1009, 40, 85, 24);
-		panel.add(labelLastName);
-		
 		JSeparator separator = new JSeparator();
 		separator.setOrientation(SwingConstants.VERTICAL);
 		separator.setBounds(1105, 40, 1, 25);
@@ -162,9 +157,9 @@ public class MyBooking extends JFrame {
 		labelBookingNumber.setBounds(1015, 130, 225, 40);
 		panel.add(labelBookingNumber);
 		
-		JLabel labelSuffix = new JLabel(flight.getPassengers().get(0).getSuffix());
+		JLabel labelSuffix = new JLabel(flight.getPassengers().get(0).getSirName());
 		labelSuffix.setFont(new Font("Century Gothic", Font.PLAIN, 14));
-		labelSuffix.setBounds(966, 40, 44, 24);
+		labelSuffix.setBounds(966, 40, 130, 24);
 		panel.add(labelSuffix);
 		
 		JPanel panel_1 = new JPanel();
@@ -263,7 +258,7 @@ public class MyBooking extends JFrame {
 		 * If there is more than one passenger it iterates through the arrayList to display all
 		 */
 		for(Passenger pass:flight.getPassengers()) {
-			labels[index].setText(pass.getSuffix()+" "+pass.getFirst_name() +" "+pass.getLast_name());
+			labels[index].setText(pass.getName());
 			index++;
 		}
 		

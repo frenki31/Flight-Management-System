@@ -46,4 +46,12 @@ public class Passenger extends Person{
 	public void setPhone_no(String phone_no) {
 		this.phone_no = phone_no;
 	}
+	@Override
+	public String getSirName(){
+		return super.getSuffix()+" "+super.getSirName();
+	}
+	@Override
+	public String getName(){
+		return super.getSuffix()+" "+super.getName();
+	}
 }
